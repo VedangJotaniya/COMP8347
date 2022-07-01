@@ -27,3 +27,8 @@ def detail(request, top_no):
     courses = Course.objects.filter(topic=top_no)
 
     return render(request, 'myApp/detail.html', {'topic_name': topics[0].get('category'), 'courses': courses})
+
+def courses(request):
+    course_list = Course.objects.all().order_by('id')
+    return render(request, 'myApp/courses.html', {'course_list': course_list})
+
