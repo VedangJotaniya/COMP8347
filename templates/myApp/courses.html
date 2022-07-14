@@ -7,9 +7,12 @@
     {% if course_list %}
         <ul>
         {% for course in course_list %}
-            <ul> {{ course.name }} </ul>
+
+            <ul> {{ course.name }}  <a href="{% url 'myApp:courses'%}/{{ course.id}}"> Interested? </a></ul>
         {% endfor %}
         </ul>
+        <p><a href="{% url 'myApp:place_order' %}">Book your courses here </a></p>
+
     {% else %}
         <p> There are no courses available this time. </p>
     {% endif %}
