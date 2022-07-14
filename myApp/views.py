@@ -58,9 +58,8 @@ def coursedetail(request, cour_id):
     course = Course.objects.get(id=cour_id)
     if request.method == 'POST':
         form = InterestForm(request.POST)
-        print(form.is_valid())
-        print(form.cleaned_data['interested'])
-        if form.is_valid() and form.cleaned_data['interested'] == 1:
+
+        if form.is_valid() and int(form.cleaned_data['interested']) == 1:
             course.interested = course.interested + 1
             course.save()
             msg = "Order was successful"
