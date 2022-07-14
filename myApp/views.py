@@ -58,12 +58,16 @@ def coursedetail(request, cour_id):
     course = Course.objects.get(id=cour_id)
     if request.method == 'POST':
         form = InterestForm(request.POST)
+        print(form.is_valid())
+        print(form.cleaned_data['interested'])
         if form.is_valid() and form.cleaned_data['interested'] == 1:
             course.interested = course.interested + 1
             course.save()
             msg = "Order was successful"
-            return render(request, '/myapp/order_response.html', {'msg': msg})
+            return render(request, 'myapp/order_response.html', {'msg': msg})
+        else:
+            msg = "Some error occured in passing the form"
+            return render(request, 'myApp/order_response.html', {'msg': msg})
     else:
         form = InterestForm()
-    print(course)
     return render(request, 'myapp/coursedetail.html', {'form': form, 'course': course})
