@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
@@ -12,13 +14,22 @@ from .forms import *
 
 def index(request):
     top_list = Topic.objects.all().order_by('id')[:10]
-
-    return render(request, 'myApp/index.html', {'top_list': top_list})
+    msg = "last login was 1 hour ago"
+    if request.session.get('last_login'):
+        msg = "last login was " + request.session['last_login'] + "ago"
+    return render(request, 'myApp/index.html', {'top_list': top_list, "msg" : msg})
 
 
 def about(request):
-
-    return render(request, 'myApp/about.html')
+    about_visits = request.COOKIES.get('about_visits')
+    if about_visits:
+        response = render(request, 'myApp/about.html', {'about_visits': about_visits})
+        about_visits = int(about_visits) + 1
+        response.set_cookie('about_visits', about_visits, expires=300)
+    else:
+        response = render(request, 'myApp/about.html', {'about_visits': 1})
+        response.set_cookie('about_visits', 1, expires=300)
+    return response
 
 
 def detail(request, top_no):
@@ -84,6 +95,9 @@ def user_login(request):
         if user:
             if user.is_active:
                 login(request, user)
+                current_time = datetime.now()
+                request.session['last_login'] = str(current_time)
+                request.session.set_expiry(60*60)
                 return HttpResponseRedirect(reverse('myApp:index'))
             else:
                 print('user is not active')
@@ -96,6 +110,7 @@ def user_login(request):
 
 @login_required
 def user_logout(request):
+    del request.session['last_login']
     logout(request)
     return HttpResponseRedirect(reverse('myApp:index'))
 
