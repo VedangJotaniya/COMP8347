@@ -25,10 +25,10 @@ def about(request):
     if about_visits:
         response = render(request, 'myApp/about.html', {'about_visits': about_visits})
         about_visits = int(about_visits) + 1
-        response.set_cookie('about_visits', about_visits, expires=300)
+        response.set_cookie('about_visits', about_visits, expires=100)
     else:
         response = render(request, 'myApp/about.html', {'about_visits': 1})
-        response.set_cookie('about_visits', 1, expires=300)
+        response.set_cookie('about_visits', 1, expires=300, )
     return response
 
 
@@ -47,6 +47,7 @@ def courses(request):
     course_list = Course.objects.all().order_by('id')
     return render(request, 'myApp/courses.html', {'course_list': course_list})
 
+@login_required
 def place_order(request):
     msg = ''
     courlist = Course.objects.all()
@@ -68,7 +69,7 @@ def place_order(request):
         form = OrderForm()
     return render(request, 'myapp/placeorder.html', {'form': form, 'msg': msg, 'courlist': courlist})
 
-
+@login_required
 def coursedetail(request, cour_id):
     course = Course.objects.get(id=cour_id)
     if request.method == 'POST':

@@ -1,6 +1,8 @@
 {% extends 'myApp/base.html' %}
 {% block myhdg %}
-    Hello Vedang
+    {% if request.user.first_name %}
+    Hello {{ request.user.first_name }}
+    {% endif %}
 {% endblock %}
 
 {% block body_block %}
