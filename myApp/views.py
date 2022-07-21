@@ -1,5 +1,9 @@
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse
+
 from .models import Topic, Course, Student, Order
 from django.shortcuts import get_object_or_404
 from .forms import *
@@ -70,3 +74,43 @@ def coursedetail(request, cour_id):
     else:
         form = InterestForm()
     return render(request, 'myapp/coursedetail.html', {'form': form, 'course': course})
+
+
+def user_login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        if user:
+            if user.is_active:
+                login(request, user)
+                return HttpResponseRedirect(reverse('myApp:index'))
+            else:
+                print('user is not active')
+                return HttpResponse('Your account is disabled.')
+        else:
+            print('username is not valid')
+            return HttpResponse('Invalid login details.')
+    else:
+        return render(request, 'myapp/login.html', {'LoginForm': LoginForm})
+
+@login_required
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('myApp:index'))
+
+@login_required
+def myaccount(request):
+    user = request.user
+    msg = ""
+    if user.is_staff:
+        msg = "You are not a Registered student"
+        return render(request, 'myapp/myaccount.html', {'msg': msg})
+    else:
+        order_list = Order.objects.filter(student__id=user.id)
+        interested_topic = Student.objects.filter(username=user.username).values('interested_in__name')
+        return render(request, 'myapp/myaccount.html',
+                      {'msg': msg, 'firstname': user.first_name, 'lastname': user.last_name, 'orderlist': order_list,
+                       'interestList': interested_topic})
+
+

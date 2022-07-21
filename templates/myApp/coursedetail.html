@@ -1,6 +1,6 @@
 {% extends 'myapp/base.html' %}
 {% block myhdg %}
-    Hello Vedang
+    Hello {{ request.user.name }}
 {% endblock %}
 
 {% block body_block %}
